@@ -94,7 +94,6 @@ load_kernel_16:
     shr eax, 9
     inc ax
 
-    BREAKPOINT
     call read_drive_16
 
     popa
@@ -127,7 +126,6 @@ reset_drive_16:
     mov dl, [drive_info.drive]
     mov ah, 0h
     int 13h
-    BREAKPOINT
     ret
 
 
@@ -137,7 +135,7 @@ read_drive_16:
     call reset_drive_16
     mov ah, 2h
     int 13h
-    BREAKPOINT
+
     test ah, 0
     jz .end
     dec si
@@ -156,7 +154,6 @@ read_drive_16:
 get_video_mode_16:
     mov ah, 0Fh
     int 10h
-    BREAKPOINT
 
     mov [video_mode.mode], al
     mov [video_mode.columns], ah
@@ -209,10 +206,10 @@ bootstrap:
 
     push video_mode  ; Pointer to video mode info
     push drive_info  ; Pointer to drive info
-    push 0xC0FFEE    ; Magic for sanity check
+    push 0xDA5B007   ; Magic for sanity check
 
     ; Use return to call kernel entry
-    push .end 
+    push .end
 
     BREAKPOINT
     push dword [READ_BUFFER_BASE]
