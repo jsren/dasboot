@@ -9,10 +9,10 @@ SECTIONS
     .text : AT(0x7E04)
     {
         _text = .;
-        *(.text);
+        *(.text*);
         _text_end = .;
     }
-    .data :
+    .data ALIGN(4) :
     {
         _data = .;
         *(.bss);

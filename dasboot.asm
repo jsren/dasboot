@@ -6,7 +6,7 @@
 ; on a floppy drive.
 ;
 %define BOOT_SIZE 512
-%define KERNEL_SIZE 1024
+%define KERNEL_SIZE 2048
 %define BREAKPOINT xchg bx, bx
 ; Be careful when changing these - segmentation
 ; can cause nasty problems

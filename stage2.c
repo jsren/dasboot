@@ -2,26 +2,42 @@
    -----------------------------------
 */
 #include "stage2.h"
+#include "screen.h"
+#include "title.h"
+
 #define BOOT_MAGIC 0xDA5B007
 
-typedef struct 
+
+
+void drawMenuItem(const char* string, uint32_t length, bool selected)
 {
-    uint8_t character;
-    unsigned foreColor : 4;
-    unsigned backColor : 4;
-} _packed_ tmchar;
+    tmcolors bg = selected ? TMCOLOR_WHITE : TMCOLOR_BLACK;
 
-
-video_mode currentVideoMode;
-
-
-void print(const char* string)
-{
-    static volatile tmchar* textBuffer = (tmchar*)0xB8000;
-
-    for (uint32_t i = 0; i < 255 && string[i] != '\0'; i++) {
-        textBuffer[i] = (tmchar){ string[i], 0xF, 0x0 };
+    // Generate background strip
+    tmchar strip[80];
+    for (int i = 0; i < 80; i++) {
+        strip[i] = (tmchar) {' ', { 0, bg }};
     }
+
+    // Print background strip
+    tmpoint linestart = screen_getpos();
+    linestart.column = 0;
+
+    screen_set(strip, 80);
+    screen_setpos(linestart);
+
+    // Print label 
+    int textstart = 80 / 2 - length / 2;
+    screen_setposxy(textstart, linestart.row);
+
+    if (selected) {
+        screen_color(TMCOLOR_BLACK, TMCOLOR_WHITE);
+    } else {
+        screen_color(TMCOLOR_GRAY, TMCOLOR_BLACK);
+    } 
+
+    screen_print(string);
+    screen_newline();
 }
 
 
@@ -31,12 +47,26 @@ void boot_main(uint32_t magic, const drive_info* driveInfo,
     // Sanity-check
     if (magic != BOOT_MAGIC) halt();
 
-    currentVideoMode = *videoMode;
-
-    print("Hello, World!");
-
     // TODO: Configure IDT
     // TODO: Set up keyboard interaction
+
+    // Clear screen
+    screen_setmode(videoMode->columns, 25);
+    screen_clear();
+
+    // Print title
+    screen_setposxy(0, 4);
+    screen_color(TMCOLOR_WHITE, TMCOLOR_BLACK);
+    screen_print(titleText);
+
+    // Print menu options
+    const char item1Text[] = "DAS IST BOOT!";
+    const char item2Text[] = "NICHT SO BOOT";
+    
+    screen_setposxy(0, 16);
+    drawMenuItem(item1Text, sizeof(item1Text) - 1, /*selected=*/true);
+    drawMenuItem(item2Text, sizeof(item2Text) - 1, /*selected=*/false);
+
     halt();
 }
 

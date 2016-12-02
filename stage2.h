@@ -1,10 +1,17 @@
+/* stage2.h - (c) 2016 James S Renwick
+   -----------------------------------
+*/
 #pragma once
+
+typedef _Bool bool;
+#define true (bool)1
+#define false 0
 
 #define _packed_ __attribute__((packed))
 #define _noreturn_ __attribute__((noreturn))
 
 typedef unsigned char uint8_t;
-typedef unsigned int uint16_t;
+typedef unsigned short int uint16_t;
 typedef unsigned long int uint32_t;
 
 
@@ -26,6 +33,8 @@ typedef struct
     uint8_t  page;
     unsigned : 8;
 } _packed_ video_mode;
+
+
 
 inline void _noreturn_ halt()
 {
